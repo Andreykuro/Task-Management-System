@@ -1,10 +1,11 @@
 <?php
 // ===================== task actions + add_task submit + announcements =====================
-// yung mga session-mutation / redirect logic na dating naka-cram sa header.php, dito na inilipat
-// wala tong sariling <html>, mga if-blocks lang na nag-e-edit ng $_SESSION tas minsan nag-re-redirect
+// yung mga session-mutation / redirect logic 
 // note: header.php lang dapat tumatawag dito (require 'actions.php';), pagkatapos ng auth/valid-page checks
 
 // view, complete delete actions fuh yeah - filters too btw
+
+
 if ($page === 'view_tasks' && isset($_GET['action'], $_GET['id'])) {
     $id     = (int) $_GET['id'];
     $action = $_GET['action'];
@@ -84,4 +85,5 @@ if ($page === 'dashboard' && $role === 'admin' && $_SERVER['REQUEST_METHOD'] ===
         $_SESSION['next_announcement_id']++;
         $announcementSuccess = 'Announcement posted!';
     }
-}
+} 
+?>

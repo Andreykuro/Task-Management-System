@@ -1,9 +1,6 @@
 <?php
 // ===================== login page =====================
-// hiniwalay namin to sa header.php kasi ang laki na niya, tas standalone naman talaga
-// itong page na to (may sariling <html> doc, di na kailangan ng header/footer.php)
-// note: header.php lang dapat tumatawag dito (require 'login.php';) pag $page === 'login'
-// laging may exit() sa dulo ng bawat branch dito so safe siya, di na babalik sa header.php
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $u = trim($_POST['username'] ?? '');
