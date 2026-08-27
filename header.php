@@ -1,24 +1,43 @@
 <?php
 
-session_start();
+session_start(); // for session btw
 
-
+// task/announcement storage bootstrap, u get da point
 if (!isset($_SESSION['tasks'])) {
     $_SESSION['tasks'] = [];
 }
 if (!isset($_SESSION['next_task_id'])) {
     $_SESSION['next_task_id'] = 1;
 }
+if (!isset($_SESSION['announcements'])) {
+    $_SESSION['announcements'] = [];
+}
+if (!isset($_SESSION['next_announcement_id'])) {
+    $_SESSION['next_announcement_id'] = 1;
+}
 
+// shortcuts na lang para di na paulit ulit yung $_SESSION[...] sa baba
 $loggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 $username = $_SESSION['username'] ?? null;
 $role     = $_SESSION['role'] ?? null;
 
+// mga taong pwedeng paglagyan ng task, admin kasama rin dito kase pwede rin sa sarili niya
 $allUsers       = ['admin', 'student1', 'student2'];
 $adminOnlyPages = ['about', 'team', 'users'];
 $validPages     = ['dashboard', 'view_tasks', 'add_task', 'about', 'team', 'users'];
 
+// view_tasks filters, complete delete
+$statusFilterOptions = ['all', 'pending', 'complete'];
+$viewTasksStatusFilter = $_GET['status_filter'] ?? 'all';
+if (!in_array($viewTasksStatusFilter, $statusFilterOptions, true)) {
+    $viewTasksStatusFilter = 'all';
+}
+$viewTasksUserFilter = $_GET['filter_user'] ?? 'all';
+if ($viewTasksUserFilter !== 'all' && !in_array($viewTasksUserFilter, $allUsers, true)) {
+    $viewTasksUserFilter = 'all';
+}
 
+// login logik
 $page = $_GET['page'] ?? ($loggedIn ? 'dashboard' : 'login');
 if (!$loggedIn) {
     $page = 'login'; // unauthenticated users only ever see the login screen
@@ -30,22 +49,19 @@ $taskError   = '';
 
 // eto ung "login" block of code
 if ($page === 'login') {
-    if ($loggedIn) {
-        header('Location: header.php?page=dashboard');
-        exit();
-    }
-
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $u = trim($_POST['username'] ?? '');
         $p = trim($_POST['password'] ?? '');
 
-        // Hardcoded credentials
+        // Hardcoded credentials (La peace bro)
         $credentials = [
             'admin'    => ['password' => 'admin123', 'role' => 'admin'],
-            'russell' => ['password' => 'pass123',  'role' => 'student'],
-            'jericson' => ['password' => 'pass123',  'role' => 'student'],
+            'student1' => ['password' => 'pass123',  'role' => 'student'],
+            'student2' => ['password' => 'pass123',  'role' => 'student'],
         ];
 
+        // ts logic where it checks if creds correct dont touch
+        // process login for creds dont touch bro
         if (isset($credentials[$u]) && $credentials[$u]['password'] === $p) {
             $_SESSION['username']  = $u;
             $_SESSION['role']      = $credentials[$u]['role'];
@@ -55,6 +71,11 @@ if ($page === 'login') {
         } else {
             $loginError = 'Invalid username or password.';
         }
+    } elseif ($loggedIn) {
+        // GET lang to (walang sinubmit na creds) straight to dash
+
+        header('Location: header.php?page=dashboard');
+        exit();
     }
     ?>
     <!DOCTYPE html>
@@ -97,8 +118,8 @@ if ($page === 'login') {
                 <div class="login-info">
                     <span class="demo-label">Demo Accounts</span>
                     <strong>Admin:</strong> admin / admin123<br>
-                    <strong>Student:</strong> russell / pass123<br>
-                    <strong>Student:</strong> jericson / pass123
+                    <strong>Student:</strong> student1 / pass123<br>
+                    <strong>Student:</strong> student2 / pass123
                 </div>
             </div>
         </div>
@@ -110,16 +131,18 @@ if ($page === 'login') {
 
 // $loggedin ts is where you see the things when you're logged on
 
+// if wrong then it brings u back
 if (!in_array($page, $validPages, true)) {
     $page = 'dashboard';
 }
 
+// dont touch 
 if (in_array($page, $adminOnlyPages, true) && $role !== 'admin') {
     header('Location: header.php?page=dashboard');
     exit();
 }
 
-// view, complete delete actions fuh yeah
+// view, complete delete actions fuh yeah - filters too btw
 if ($page === 'view_tasks' && isset($_GET['action'], $_GET['id'])) {
     $id     = (int) $_GET['id'];
     $action = $_GET['action'];
@@ -138,14 +161,23 @@ if ($page === 'view_tasks' && isset($_GET['action'], $_GET['id'])) {
             break;
         }
     }
-    header('Location: header.php?page=view_tasks');
+
+    $redirectBack = 'header.php?page=view_tasks';
+    if ($viewTasksStatusFilter !== 'all') {
+        $redirectBack .= '&status_filter=' . urlencode($viewTasksStatusFilter);
+    }
+    if ($viewTasksUserFilter !== 'all') {
+        $redirectBack .= '&filter_user=' . urlencode($viewTasksUserFilter);
+    }
+    header('Location: ' . $redirectBack);
     exit();
 }
 
-// ----- add_task: form submission -----
+// ----- add_task: form submission, ts where u push task type shi -----
 if ($page === 'add_task' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $title       = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
+    $dueDate     = trim($_POST['due_date'] ?? '');
     $owner       = $role === 'admin' ? ($_POST['assigned_to'] ?? '') : $username;
 
     if ($title === '') {
@@ -159,6 +191,7 @@ if ($page === 'add_task' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             'description'  => $description,
             'owner'        => $owner,
             'status'       => 'pending',
+            'due_date'     => $dueDate, // pwede blank, optional lang siya
             'date_created' => date('Y-m-d H:i'),
         ];
         $_SESSION['next_task_id']++;
@@ -166,6 +199,32 @@ if ($page === 'add_task' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// ----- dashboard: class announcements (stream), only admins can modify ts -----
+if ($page === 'dashboard' && $role === 'admin' && isset($_GET['delete_announcement'])) {
+    $delId = (int) $_GET['delete_announcement'];
+    $_SESSION['announcements'] = array_values(array_filter($_SESSION['announcements'], function ($a) use ($delId) {
+        return $a['id'] !== $delId;
+    }));
+    header('Location: header.php?page=dashboard');
+    exit();
+}
+
+$announcementSuccess = '';
+if ($page === 'dashboard' && $role === 'admin' && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['announcement_message'])) {
+    $announcementMsg = trim($_POST['announcement_message']);
+    if ($announcementMsg !== '') {
+        $_SESSION['announcements'][] = [
+            'id'          => $_SESSION['next_announcement_id'],
+            'message'     => $announcementMsg,
+            'posted_by'   => $username,
+            'date_posted' => date('Y-m-d H:i'),
+        ];
+        $_SESSION['next_announcement_id']++;
+        $announcementSuccess = 'Announcement posted!';
+    }
+}
+
+// so this is the page titles lol
 $pageTitles = [
     'dashboard'  => 'Dashboard - Task Manager',
     'view_tasks' => 'View Tasks - Task Manager',
@@ -187,6 +246,7 @@ $page_title = $pageTitles[$page];
 </head>
 
 <body>
+    <!-- dito na nagsisimula yung actual layout, header tas nav, pareho to sa lahat ng page -->
     <div class="container">
         <header class="header">
             <div class="logo">
@@ -213,9 +273,10 @@ $page_title = $pageTitles[$page];
         </nav>
 
 <?php
-// ===================== PAGE CONTENT =====================
+// ===================== ts the page content note to self: dashboard area to =====================
 
 if ($page === 'dashboard') {
+    // dashboard lang to, stats + announcements + progress bar
 
     if ($role === 'admin') {
         $myTasks = $_SESSION['tasks'];
@@ -227,6 +288,7 @@ if ($page === 'dashboard') {
     $total     = count($myTasks);
     $pending   = count(array_filter($myTasks, function ($t) { return $t['status'] === 'pending'; }));
     $completed = count(array_filter($myTasks, function ($t) { return $t['status'] === 'complete'; }));
+    $percent   = $total > 0 ? round($completed / $total * 100) : 0;
     ?>
     <div class="content">
         <h2>🏠 Dashboard</h2>
@@ -240,6 +302,39 @@ if ($page === 'dashboard') {
                 👋 Welcome back, <strong><?php echo htmlspecialchars($username); ?></strong>! Here's an overview of your tasks.
             </div>
         <?php endif; ?>
+
+        <!-- 📢 class stream / announcements (six seven-) -->
+        <div class="quick-actions" style="margin-bottom:20px;">
+            <h3>📢 Class Announcements</h3>
+
+            <?php if ($role === 'admin'): ?>
+                <?php if ($announcementSuccess): ?>
+                    <div class="success-message"><?php echo htmlspecialchars($announcementSuccess); ?></div>
+                <?php endif; ?>
+                <form method="POST" action="header.php?page=dashboard" style="margin-bottom:15px;">
+                    <div class="form-group">
+                        <textarea name="announcement_message" rows="2" placeholder="Post an announcement for everyone..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">📢 Post Announcement</button>
+                </form>
+            <?php endif; ?>
+
+            <?php if (empty($_SESSION['announcements'])): ?>
+                <p style="color:#718096;">No announcements yet.</p>
+            <?php else: ?>
+                <?php foreach (array_reverse($_SESSION['announcements']) as $a): ?>
+                    <div style="border-left:4px solid #4299e1; padding:10px 15px; margin-bottom:10px; background:#f7fafc; border-radius:6px;">
+                        <p style="margin:0;"><?php echo nl2br(htmlspecialchars($a['message'])); ?></p>
+                        <p style="margin:5px 0 0; font-size:12px; color:#a0aec0;">
+                            — <?php echo htmlspecialchars($a['posted_by']); ?> · <?php echo htmlspecialchars($a['date_posted']); ?>
+                            <?php if ($role === 'admin'): ?>
+                                · <a href="header.php?page=dashboard&delete_announcement=<?php echo $a['id']; ?>" onclick="return confirm('Delete this announcement?');" style="color:#e53e3e;">Delete</a>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -256,6 +351,17 @@ if ($page === 'dashboard') {
             </div>
         </div>
 
+        <!-- 📈 completion progress bar -->
+        <div class="quick-actions" style="margin-bottom:20px;">
+            <h3>📈 Completion Progress</h3>
+            <div style="background:#e2e8f0; border-radius:8px; overflow:hidden; height:22px; width:100%;">
+                <div style="background:#48bb78; height:100%; width:<?php echo $percent; ?>%; transition:width 0.3s; text-align:right; color:#fff; font-size:12px; line-height:22px; padding-right:6px; box-sizing:border-box;">
+                    <?php echo $percent > 8 ? $percent . '%' : ''; ?>
+                </div>
+            </div>
+            <p style="margin-top:6px; font-size:14px; color:#4a5568;"><?php echo $percent; ?>% completed (<?php echo $completed; ?> of <?php echo $total; ?> tasks)</p>
+        </div>
+
         <div class="quick-actions">
             <h3>Quick Actions</h3>
             <a href="header.php?page=view_tasks" class="btn-primary">📋 View Tasks</a>
@@ -268,6 +374,7 @@ if ($page === 'dashboard') {
     <?php
 
 } elseif ($page === 'view_tasks') {
+    // this is where you'll see all the task (filters too btw lol)
 
     if ($role === 'admin') {
         $tasks = $_SESSION['tasks'];
@@ -276,6 +383,20 @@ if ($page === 'dashboard') {
             return $t['owner'] === $username;
         });
     }
+
+    // apply filters (status + assigned user for admin)
+    if ($viewTasksStatusFilter !== 'all') {
+        $tasks = array_filter($tasks, function ($t) use ($viewTasksStatusFilter) {
+            return $t['status'] === $viewTasksStatusFilter;
+        });
+    }
+    if ($role === 'admin' && $viewTasksUserFilter !== 'all') {
+        $tasks = array_filter($tasks, function ($t) use ($viewTasksUserFilter) {
+            return $t['owner'] === $viewTasksUserFilter;
+        });
+    }
+
+    $filtersActive = $viewTasksStatusFilter !== 'all' || $viewTasksUserFilter !== 'all';
     ?>
     <div class="content">
         <h2>📋 View Tasks</h2>
@@ -286,10 +407,38 @@ if ($page === 'dashboard') {
             <div class="role-notice student-notice">Showing your own tasks only.</div>
         <?php endif; ?>
 
+        <!-- 🔍 filter controls -->
+        <form method="GET" action="header.php" class="task-form" style="margin-bottom:20px;">
+            <input type="hidden" name="page" value="view_tasks">
+            <div class="form-group" style="display:inline-block; margin-right:15px;">
+                <label for="status_filter">Status</label>
+                <select id="status_filter" name="status_filter" onchange="this.form.submit()">
+                    <option value="all" <?php echo $viewTasksStatusFilter === 'all' ? 'selected' : ''; ?>>All</option>
+                    <option value="pending" <?php echo $viewTasksStatusFilter === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                    <option value="complete" <?php echo $viewTasksStatusFilter === 'complete' ? 'selected' : ''; ?>>Completed</option>
+                </select>
+            </div>
+            <?php if ($role === 'admin'): ?>
+                <div class="form-group" style="display:inline-block;">
+                    <label for="filter_user">Assigned To</label>
+                    <select id="filter_user" name="filter_user" onchange="this.form.submit()">
+                        <option value="all" <?php echo $viewTasksUserFilter === 'all' ? 'selected' : ''; ?>>All Users</option>
+                        <?php foreach ($allUsers as $u): ?>
+                            <option value="<?php echo htmlspecialchars($u); ?>" <?php echo $viewTasksUserFilter === $u ? 'selected' : ''; ?>><?php echo htmlspecialchars($u); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php endif; ?>
+        </form>
+
         <?php if (empty($tasks)): ?>
             <div class="empty-state">
-                <p>No tasks yet.</p>
-                <a href="header.php?page=add_task" class="btn-primary">➕ Add a Task</a>
+                <?php if ($filtersActive): ?>
+                    <p>No tasks match your filter.</p>
+                <?php else: ?>
+                    <p>No tasks yet.</p>
+                    <a href="header.php?page=add_task" class="btn-primary">➕ Add a Task</a>
+                <?php endif; ?>
             </div>
         <?php else: ?>
             <table class="task-table">
@@ -297,6 +446,7 @@ if ($page === 'dashboard') {
                     <tr>
                         <th>Title</th>
                         <th>Description</th>
+                        <th>Due Date</th>
                         <?php if ($role === 'admin'): ?><th>Created By</th><?php endif; ?>
                         <th>Status</th>
                         <th>Actions</th>
@@ -307,6 +457,19 @@ if ($page === 'dashboard') {
                         <tr>
                             <td><?php echo htmlspecialchars($task['title']); ?></td>
                             <td><?php echo htmlspecialchars($task['description']); ?></td>
+                            <td>
+                                <?php
+                                $due = $task['due_date'] ?? '';
+                                if ($due === '') {
+                                    echo '—';
+                                } else {
+                                    echo htmlspecialchars($due);
+                                    if ($task['status'] !== 'complete' && strtotime($due) < strtotime('today')) {
+                                        echo ' <span style="color:#e53e3e; font-weight:bold;">⚠️ Overdue</span>';
+                                    }
+                                }
+                                ?>
+                            </td>
                             <?php if ($role === 'admin'): ?>
                                 <td><?php echo htmlspecialchars($task['owner']); ?></td>
                             <?php endif; ?>
@@ -336,6 +499,7 @@ if ($page === 'dashboard') {
     <?php
 
 } elseif ($page === 'add_task') {
+    // form itself
     ?>
     <div class="content">
         <h2>➕ Add Task</h2>
@@ -355,6 +519,10 @@ if ($page === 'dashboard') {
             <div class="form-group">
                 <label for="description">Description</label>
                 <textarea id="description" name="description" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="due_date">Due Date (optional)</label>
+                <input type="date" id="due_date" name="due_date">
             </div>
 
             <?php if ($role === 'admin'): ?>
@@ -380,6 +548,7 @@ if ($page === 'dashboard') {
     <?php
 
 } elseif ($page === 'about') {
+    // project info lang to
     ?>
     <div class="content">
         <h2>ℹ️ About This Project</h2>
@@ -395,6 +564,10 @@ if ($page === 'dashboard') {
                     <li>Role-based page access (Admin / Student)</li>
                     <li>Task creation, completion, and deletion</li>
                     <li>Persistent task data across login sessions</li>
+                    <li>Task due dates with automatic overdue flagging</li>
+                    <li>Class-wide announcements posted by the admin</li>
+                    <li>Completion progress tracking per user</li>
+                    <li>Search and filter tasks by status and assignee</li>
                     <li>Single-file routing through header.php</li>
                 </ul>
             </div>
@@ -411,6 +584,7 @@ if ($page === 'dashboard') {
     <?php
 
 } elseif ($page === 'team') {
+    // The Boys
 
     $team = [
         ['name' => 'Andrey',   'desc' => 'Luis Andrey A. Baluyot.', 'photo' => 'dre.jpg'],
@@ -434,6 +608,7 @@ if ($page === 'dashboard') {
     <?php
 
 } elseif ($page === 'users') {
+    // userlist to
 
     $usersList = [
         'admin'    => 'Admin',
@@ -451,6 +626,7 @@ if ($page === 'dashboard') {
                     <th>Total Tasks</th>
                     <th>Pending</th>
                     <th>Completed</th>
+                    <th>Progress</th>
                 </tr>
             </thead>
             <tbody>
@@ -459,6 +635,7 @@ if ($page === 'dashboard') {
                     $uTotal     = count($userTasks);
                     $uPending   = count(array_filter($userTasks, function ($t) { return $t['status'] === 'pending'; }));
                     $uCompleted = count(array_filter($userTasks, function ($t) { return $t['status'] === 'complete'; }));
+                    $uPercent   = $uTotal > 0 ? round($uCompleted / $uTotal * 100) : 0;
                 ?>
                     <tr>
                         <td><?php echo htmlspecialchars($uname); ?></td>
@@ -466,6 +643,12 @@ if ($page === 'dashboard') {
                         <td><?php echo $uTotal; ?></td>
                         <td><?php echo $uPending; ?></td>
                         <td><?php echo $uCompleted; ?></td>
+                        <td>
+                            <div style="background:#e2e8f0; border-radius:6px; overflow:hidden; height:14px; width:100px; display:inline-block; vertical-align:middle;">
+                                <div style="background:#48bb78; height:100%; width:<?php echo $uPercent; ?>%;"></div>
+                            </div>
+                            <span style="margin-left:6px; font-size:12px;"><?php echo $uPercent; ?>%</span>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -474,4 +657,5 @@ if ($page === 'dashboard') {
     <?php
 }
 
+// inclusion btw (hi sir)
 include 'footer.php';

@@ -1,4 +1,4 @@
-/* ===== GLOBAL RESET & BASE ===== */
+/* ===== this is da global base ===== */
 * {
     margin: 0;
     padding: 0;
@@ -11,7 +11,7 @@ body {
     color: #2d3748;
 }
 
-/* ===== BPSU COLOR THEME ===== */
+/* ===== Primary colors ===== */
 :root {
     --bpsu-primary: #003366;      /* Dark Navy Blue */
     --bpsu-primary-dark: #002244;  /* Darker Navy */
@@ -23,7 +23,7 @@ body {
     --bpsu-gray: #f7fafc;
 }
 
-/* ===== LOGIN PAGE ===== */
+/* ===== Login page area ===== */
 .login-container {
     min-height: 100vh;
     display: flex;
@@ -172,14 +172,14 @@ body {
     margin-bottom: 5px;
 }
 
-/* ===== MAIN LAYOUT ===== */
+/* ===== eto ung main layout  ===== */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* ===== HEADER ===== */
+/* ===== ts da header ===== */
 .header {
     background: linear-gradient(135deg, #003366 0%, #1a5276 50%, #002244 100%);
     color: var(--bpsu-white);
@@ -245,7 +245,7 @@ body {
     box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
 }
 
-/* ===== ROLE BADGES ===== */
+/* ===== role badge (not using this forgot to remove) ===== */
 .role-badge {
     display: inline-block;
     padding: 4px 14px;
@@ -266,7 +266,7 @@ body {
     color: white;
 }
 
-/* ===== NAVIGATION ===== */
+/* ===== Navigation ===== */
 .nav-menu {
     background: var(--bpsu-white);
     padding: 12px 20px;
@@ -303,7 +303,7 @@ body {
     background: var(--bpsu-primary-dark);
 }
 
-/* ===== CONTENT ===== */
+/* ===== this is the (Content) ===== */
 .content {
     background: var(--bpsu-white);
     padding: 30px;
@@ -322,7 +322,7 @@ body {
     padding-bottom: 15px;
 }
 
-/* ===== ROLE NOTICES ===== */
+/* ===== role notices ===== */
 .role-notice {
     padding: 15px 20px;
     border-radius: 8px;
@@ -444,7 +444,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* ===== TASK TABLE ===== */
+/* ===== Task table  ===== */
 .task-table {
     width: 100%;
     border-collapse: collapse;
@@ -549,7 +549,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* ===== ADD TASK FORM ===== */
+/* ===== ts the add task form btw ===== */
 .task-form {
     max-width: 600px;
     margin: 0 auto;
@@ -626,7 +626,7 @@ body {
     background: #cbd5e0;
 }
 
-/* ===== MESSAGES ===== */
+/* ===== msgs===== */
 .success-message {
     background: #c6f6d5;
     color: #22543d;
@@ -645,7 +645,7 @@ body {
     border-left: 4px solid #e53e3e;
 }
 
-/* ===== ABOUT PAGE ===== */
+/* ===== aboput page ===== */
 .about-container {
     max-width: 800px;
     margin: 0 auto;
@@ -735,7 +735,7 @@ body {
     line-height: 1.6;
 }
 
-/* ===== FOOTER ===== */
+/* ===== footer to ===== */
 .footer {
     margin-top: 30px;
     padding: 20px;
