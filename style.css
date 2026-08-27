@@ -1,0 +1,843 @@
+/* ===== GLOBAL RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+    color: #2d3748;
+}
+
+/* ===== BPSU COLOR THEME ===== */
+:root {
+    --bpsu-primary: #003366;      /* Dark Navy Blue */
+    --bpsu-primary-dark: #002244;  /* Darker Navy */
+    --bpsu-secondary: #1a5276;     /* Medium Blue */
+    --bpsu-accent: #d4a017;        /* Gold/Amber */
+    --bpsu-accent-light: #f0c040;  /* Lighter Gold */
+    --bpsu-light: #e8f0fe;         /* Light Blue */
+    --bpsu-white: #ffffff;
+    --bpsu-gray: #f7fafc;
+}
+
+/* ===== LOGIN PAGE ===== */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #003366 0%, #1a5276 50%, #002244 100%);
+    padding: 20px;
+}
+
+.login-box {
+    background: var(--bpsu-white);
+    padding: 45px 40px;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    width: 420px;
+    max-width: 100%;
+    border-top: 6px solid var(--bpsu-accent);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header .logo-container {
+    margin-bottom: 15px;
+}
+
+.login-header .logo-container img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--bpsu-accent);
+    padding: 5px;
+}
+
+.login-header h1 {
+    color: var(--bpsu-primary);
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.login-header .subtitle {
+    color: #718096;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.login-header .university-name {
+    color: var(--bpsu-primary);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 5px;
+}
+
+.login-box .form-group {
+    margin-bottom: 20px;
+}
+
+.login-box label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--bpsu-primary);
+    font-size: 14px;
+}
+
+.login-box input[type="text"],
+.login-box input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    background: #f8fafc;
+}
+
+.login-box input[type="text"]:focus,
+.login-box input[type="password"]:focus {
+    outline: none;
+    border-color: var(--bpsu-accent);
+    background: var(--bpsu-white);
+    box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.1);
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background: var(--bpsu-primary);
+    color: var(--bpsu-white);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.btn-login:hover {
+    background: var(--bpsu-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 51, 102, 0.3);
+}
+
+.btn-reset {
+    width: 100%;
+    padding: 12px;
+    background: #e2e8f0;
+    color: var(--bpsu-primary);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-reset:hover {
+    background: #cbd5e0;
+}
+
+.login-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--bpsu-light);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--bpsu-primary);
+    border: 1px solid #d4e0f0;
+}
+
+.login-info strong {
+    color: var(--bpsu-accent);
+}
+
+.login-info .demo-label {
+    font-weight: 700;
+    color: var(--bpsu-primary);
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: linear-gradient(135deg, #003366 0%, #1a5276 50%, #002244 100%);
+    color: var(--bpsu-white);
+    padding: 20px 30px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2);
+    border-bottom: 4px solid var(--bpsu-accent);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--bpsu-accent);
+}
+
+.logo h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.logo .school-tag {
+    font-size: 10px;
+    opacity: 0.8;
+    display: block;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-logout {
+    background: #c0392b;
+    color: var(--bpsu-white);
+    padding: 8px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.btn-logout:hover {
+    background: #e74c3c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
+}
+
+/* ===== ROLE BADGES ===== */
+.role-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.role-badge.admin {
+    background: var(--bpsu-accent);
+    color: var(--bpsu-primary-dark);
+}
+
+.role-badge.student {
+    background: #48bb78;
+    color: white;
+}
+
+/* ===== NAVIGATION ===== */
+.nav-menu {
+    background: var(--bpsu-white);
+    padding: 12px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    border-bottom: 3px solid var(--bpsu-accent);
+}
+
+.nav-menu a {
+    color: var(--bpsu-primary);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.nav-menu a:hover {
+    background: var(--bpsu-light);
+    color: var(--bpsu-primary-dark);
+}
+
+.nav-menu a.active {
+    background: var(--bpsu-primary);
+    color: var(--bpsu-white);
+}
+
+.nav-menu a.active:hover {
+    background: var(--bpsu-primary-dark);
+}
+
+/* ===== CONTENT ===== */
+.content {
+    background: var(--bpsu-white);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    min-height: 400px;
+    border-top: 4px solid var(--bpsu-accent);
+}
+
+.content h2 {
+    margin-bottom: 25px;
+    color: var(--bpsu-primary);
+    font-weight: 700;
+    font-size: 24px;
+    border-bottom: 2px solid var(--bpsu-light);
+    padding-bottom: 15px;
+}
+
+/* ===== ROLE NOTICES ===== */
+.role-notice {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border-left: 4px solid;
+}
+
+.admin-notice {
+    background: #ebf4ff;
+    border-left-color: var(--bpsu-accent);
+    color: var(--bpsu-primary);
+}
+
+.student-notice {
+    background: #f0fff4;
+    border-left-color: #48bb78;
+    color: #22543d;
+}
+
+/* ===== DASHBOARD STATS ===== */
+.stats-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    flex: 1;
+    min-width: 150px;
+    background: var(--bpsu-gray);
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card:first-child {
+    border-color: var(--bpsu-primary);
+}
+
+.stat-card.pending {
+    border-color: #ed8936;
+}
+
+.stat-card.completed {
+    border-color: #48bb78;
+}
+
+.stat-number {
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--bpsu-primary);
+}
+
+.stat-card.pending .stat-number {
+    color: #ed8936;
+}
+
+.stat-card.completed .stat-number {
+    color: #48bb78;
+}
+
+.stat-label {
+    color: #718096;
+    margin-top: 5px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.quick-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid var(--bpsu-light);
+}
+
+.quick-actions h3 {
+    margin-bottom: 15px;
+    color: var(--bpsu-primary);
+}
+
+.btn-primary, .btn-secondary {
+    display: inline-block;
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: var(--bpsu-primary);
+    color: var(--bpsu-white);
+}
+
+.btn-primary:hover {
+    background: var(--bpsu-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 51, 102, 0.3);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: var(--bpsu-primary);
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+    transform: translateY(-2px);
+}
+
+/* ===== TASK TABLE ===== */
+.task-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.task-table thead {
+    background: var(--bpsu-primary);
+    color: var(--bpsu-white);
+}
+
+.task-table th {
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.task-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.task-table tbody tr:hover {
+    background: var(--bpsu-light);
+}
+
+.task-table tbody tr:nth-child(even) {
+    background: #fafcff;
+}
+
+.task-table tbody tr:nth-child(even):hover {
+    background: var(--bpsu-light);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.pending {
+    background: #fefcbf;
+    color: #975a16;
+}
+
+.status-badge.complete {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.btn-complete {
+    background: #48bb78;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: inline-block;
+}
+
+.btn-complete:hover {
+    background: #38a169;
+    transform: scale(1.05);
+}
+
+.btn-delete {
+    background: #e53e3e;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.btn-delete:hover {
+    background: #c53030;
+    transform: scale(1.05);
+}
+
+.completed-text {
+    color: #48bb78;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state p {
+    font-size: 20px;
+    color: #718096;
+    margin-bottom: 20px;
+}
+
+/* ===== ADD TASK FORM ===== */
+.task-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.task-form .form-group {
+    margin-bottom: 20px;
+}
+
+.task-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--bpsu-primary);
+    font-size: 14px;
+}
+
+.task-form input[type="text"],
+.task-form textarea,
+.task-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s;
+    background: #f8fafc;
+}
+
+.task-form input[type="text"]:focus,
+.task-form textarea:focus,
+.task-form select:focus {
+    outline: none;
+    border-color: var(--bpsu-accent);
+    background: var(--bpsu-white);
+    box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.1);
+}
+
+.task-form select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333333' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+}
+
+.btn-submit, .btn-reset-form {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-submit {
+    background: var(--bpsu-primary);
+    color: var(--bpsu-white);
+    margin-right: 10px;
+}
+
+.btn-submit:hover {
+    background: var(--bpsu-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 51, 102, 0.3);
+}
+
+.btn-reset-form {
+    background: #e2e8f0;
+    color: var(--bpsu-primary);
+}
+
+.btn-reset-form:hover {
+    background: #cbd5e0;
+}
+
+/* ===== MESSAGES ===== */
+.success-message {
+    background: #c6f6d5;
+    color: #22543d;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #48bb78;
+}
+
+.error-message {
+    background: #fed7d7;
+    color: #c53030;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #e53e3e;
+}
+
+/* ===== ABOUT PAGE ===== */
+.about-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-section {
+    margin-bottom: 25px;
+    padding: 20px 25px;
+    background: var(--bpsu-gray);
+    border-radius: 10px;
+    border-left: 4px solid var(--bpsu-accent);
+}
+
+.about-section h3 {
+    color: var(--bpsu-primary);
+    margin-bottom: 10px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.about-section p {
+    line-height: 1.8;
+    color: #4a5568;
+}
+
+.about-section ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+.about-section ul li {
+    padding: 6px 0;
+    color: #4a5568;
+}
+
+.about-section ul li::before {
+    content: "▸ ";
+    color: var(--bpsu-accent);
+    font-weight: bold;
+}
+
+/* ===== TEAM PAGE ===== */
+.team-grid {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.team-card {
+    flex: 1;
+    min-width: 250px;
+    max-width: 350px;
+    background: var(--bpsu-gray);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 30px 25px;
+    text-align: center;
+    transition: all 0.3s;
+    border-top: 4px solid var(--bpsu-accent);
+}
+
+.team-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.member-photo {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 15px;
+    display: block;
+    border: 3px solid var(--bpsu-accent);
+}
+
+.team-card h3 {
+    color: var(--bpsu-primary);
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.team-card .description {
+    color: #718096;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    margin-top: 30px;
+    padding: 20px;
+    text-align: center;
+    background: var(--bpsu-white);
+    border-radius: 12px;
+    color: #718096;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-top: 3px solid var(--bpsu-accent);
+}
+
+.footer .bpsu-brand {
+    color: var(--bpsu-primary);
+    font-weight: 600;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px 20px;
+    }
+    
+    .user-info {
+        justify-content: center;
+    }
+    
+    .nav-menu {
+        justify-content: center;
+        padding: 10px 15px;
+    }
+    
+    .nav-menu a {
+        font-size: 13px;
+        padding: 6px 12px;
+    }
+    
+    .stats-grid {
+        flex-direction: column;
+    }
+    
+    .stat-card {
+        min-width: unset;
+    }
+    
+    .team-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .team-card {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .task-table {
+        font-size: 13px;
+    }
+    
+    .task-table th,
+    .task-table td {
+        padding: 8px 10px;
+    }
+    
+    .login-box {
+        padding: 30px 25px;
+    }
+    
+    .login-header h1 {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .task-table {
+        font-size: 12px;
+    }
+    
+    .task-table th,
+    .task-table td {
+        padding: 6px 8px;
+    }
+    
+    .content {
+        padding: 15px;
+        overflow-x: auto;
+    }
+    
+    .btn-primary, .btn-secondary {
+        display: block;
+        width: 100%;
+        margin-right: 0;
+        text-align: center;
+    }
+    
+    .btn-submit, .btn-reset-form {
+        display: block;
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+}
