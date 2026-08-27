@@ -47,86 +47,10 @@ $loginError  = '';
 $taskSuccess = '';
 $taskError   = '';
 
-// eto ung "login" block of code
+// ito na yung buong login page, hiniwalay namin dito para di na crowded - see login.php
+// laging may exit() si login.php sa lahat ng branch niya kaya safe, di na babalik dito
 if ($page === 'login') {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $u = trim($_POST['username'] ?? '');
-        $p = trim($_POST['password'] ?? '');
-
-        // Hardcoded credentials (La peace bro)
-        $credentials = [
-            'admin'    => ['password' => 'admin123', 'role' => 'admin'],
-            'student1' => ['password' => 'pass123',  'role' => 'student'],
-            'student2' => ['password' => 'pass123',  'role' => 'student'],
-        ];
-
-        // ts logic where it checks if creds correct dont touch
-        // process login for creds dont touch bro
-        if (isset($credentials[$u]) && $credentials[$u]['password'] === $p) {
-            $_SESSION['username']  = $u;
-            $_SESSION['role']      = $credentials[$u]['role'];
-            $_SESSION['logged_in'] = true;
-            header('Location: header.php?page=dashboard');
-            exit();
-        } else {
-            $loginError = 'Invalid username or password.';
-        }
-    } elseif ($loggedIn) {
-        // GET lang to (walang sinubmit na creds) straight to dash
-
-        header('Location: header.php?page=dashboard');
-        exit();
-    }
-    ?>
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login - Task Manager</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div class="login-container">
-            <div class="login-box">
-                <div class="login-header">
-                    <div class="logo-container">
-                        <span style="font-size:50px;">📋</span>
-                    </div>
-                    <h1>Task Manager</h1>
-                    <p class="subtitle">Sign in to manage your tasks</p>
-                    <p class="university-name">ITCC1023 - Web Systems and Technologies I</p>
-                </div>
-
-                <?php if ($loginError): ?>
-                    <div class="error-message"><?php echo htmlspecialchars($loginError); ?></div>
-                <?php endif; ?>
-
-                <form method="POST" action="header.php?page=login">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required autofocus>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn-login">🔐 Login</button>
-                    <button type="reset" class="btn-reset">Clear</button>
-                </form>
-
-                <div class="login-info">
-                    <span class="demo-label">Demo Accounts</span>
-                    <strong>Admin:</strong> admin / admin123<br>
-                    <strong>Student:</strong> student1 / pass123<br>
-                    <strong>Student:</strong> student2 / pass123
-                </div>
-            </div>
-        </div>
-    </body>
-    </html>
-    <?php
-    exit();
+    require 'login.php';
 }
 
 // $loggedin ts is where you see the things when you're logged on
@@ -142,87 +66,9 @@ if (in_array($page, $adminOnlyPages, true) && $role !== 'admin') {
     exit();
 }
 
-// view, complete delete actions fuh yeah - filters too btw
-if ($page === 'view_tasks' && isset($_GET['action'], $_GET['id'])) {
-    $id     = (int) $_GET['id'];
-    $action = $_GET['action'];
-
-    foreach ($_SESSION['tasks'] as $index => $task) {
-        if ($task['id'] === $id) {
-            $isOwner = $task['owner'] === $username;
-
-            if ($action === 'complete' && ($role === 'admin' || $isOwner)) {
-                $_SESSION['tasks'][$index]['status'] = 'complete';
-            }
-            if ($action === 'delete' && $role === 'admin') {
-                unset($_SESSION['tasks'][$index]);
-                $_SESSION['tasks'] = array_values($_SESSION['tasks']);
-            }
-            break;
-        }
-    }
-
-    $redirectBack = 'header.php?page=view_tasks';
-    if ($viewTasksStatusFilter !== 'all') {
-        $redirectBack .= '&status_filter=' . urlencode($viewTasksStatusFilter);
-    }
-    if ($viewTasksUserFilter !== 'all') {
-        $redirectBack .= '&filter_user=' . urlencode($viewTasksUserFilter);
-    }
-    header('Location: ' . $redirectBack);
-    exit();
-}
-
-// ----- add_task: form submission, ts where u push task type shi -----
-if ($page === 'add_task' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title       = trim($_POST['title'] ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $dueDate     = trim($_POST['due_date'] ?? '');
-    $owner       = $role === 'admin' ? ($_POST['assigned_to'] ?? '') : $username;
-
-    if ($title === '') {
-        $taskError = 'Task title is required.';
-    } elseif ($role === 'admin' && !in_array($owner, $allUsers, true)) {
-        $taskError = 'Please select a valid user to assign the task to.';
-    } else {
-        $_SESSION['tasks'][] = [
-            'id'           => $_SESSION['next_task_id'],
-            'title'        => $title,
-            'description'  => $description,
-            'owner'        => $owner,
-            'status'       => 'pending',
-            'due_date'     => $dueDate, // pwede blank, optional lang siya
-            'date_created' => date('Y-m-d H:i'),
-        ];
-        $_SESSION['next_task_id']++;
-        $taskSuccess = 'Task added successfully!';
-    }
-}
-
-// ----- dashboard: class announcements (stream), only admins can modify ts -----
-if ($page === 'dashboard' && $role === 'admin' && isset($_GET['delete_announcement'])) {
-    $delId = (int) $_GET['delete_announcement'];
-    $_SESSION['announcements'] = array_values(array_filter($_SESSION['announcements'], function ($a) use ($delId) {
-        return $a['id'] !== $delId;
-    }));
-    header('Location: header.php?page=dashboard');
-    exit();
-}
-
-$announcementSuccess = '';
-if ($page === 'dashboard' && $role === 'admin' && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['announcement_message'])) {
-    $announcementMsg = trim($_POST['announcement_message']);
-    if ($announcementMsg !== '') {
-        $_SESSION['announcements'][] = [
-            'id'          => $_SESSION['next_announcement_id'],
-            'message'     => $announcementMsg,
-            'posted_by'   => $username,
-            'date_posted' => date('Y-m-d H:i'),
-        ];
-        $_SESSION['next_announcement_id']++;
-        $announcementSuccess = 'Announcement posted!';
-    }
-}
+// task actions (complete/delete), add_task submit, at announcements - inilipat sa sarili nilang
+// file para di na sobrang haba dito, see actions.php
+require 'actions.php';
 
 // so this is the page titles lol
 $pageTitles = [
