@@ -433,10 +433,10 @@ if ($page === 'dashboard') {
     // The Boys
 
     $team = [
-        ['name' => 'Andrey',   'desc' => 'Luis Andrey A. Baluyot.', 'photo' => 'dre.jpg'],
-        ['name' => 'Raye',    'desc' => 'Raye Lorence C. Cortez', 'photo' => 'ry.jpg'],
-        ['name' => 'Russell',  'desc' => 'Russell Rain R. De Leon.', 'photo' => 'russ.jpg'],
-        ['name' => 'Jericson', 'desc' => 'Jericson S. Camacho.', 'photo' => 'jeric.jpg'],
+        ['name' => 'Andrey',   'desc' => 'Luis Andrey A. Baluyot. (Lead Developer & Project Manager)', 'photo' => 'dre.jpg'],
+        ['name' => 'Raye',    'desc' => 'Raye Lorence C. Cortez (UI/UX)', 'photo' => 'ry.jpg'],
+        ['name' => 'Russell',  'desc' => 'Russell Rain R. De Leon. (QA Tester & Developer)', 'photo' => 'russ.jpg'],
+        ['name' => 'Jericson', 'desc' => 'Jericson S. Camacho. (QA)', 'photo' => 'jeric.jpg'],
     ];
     ?>
     <div class="content">
